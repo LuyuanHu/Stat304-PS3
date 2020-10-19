@@ -1,0 +1,451 @@
+
+---
+title: "Empirical Analysis and Evaluation on the Factors Associated with Well-being of the Elder"
+author: "Luyuan Hu, Jiayi Wang, Linwei Yao & Bihan Lu"
+date: "10/15/2020"
+output: pdf_document
+---
+\begin{center}
+https://github.com/LuyuanHu/Stat304-PS3
+\end{center}
+
+# Abstract
+The well-being of the aged is gaining mounting attention from scholars across the world where the aging problems have swept. The paper, based on the General social survey on aging and social support (cycle 16, 2002) and a combination of qualitative and quantitative analysis, conducts a comprehensive and systematic research in the influence factors of the well-being of the aged and their contribution margins from the perspectives of the basic demographic characteristics, retirement, health, social support and involvement and economic incomes, by studying and selecting relevant questions presented in the Survey. In its empirical study, the paper revealed the general status  of the well-being of the elderly and its difference among different aging groups through descriptive statistics; then, by employing Ordered Probit Regression Model, it examined whether the proposed influence factors mentioned above have remarkable impact on their well-being.
+
+**Key words and phrases:**  Ordered probit; well-being; aging; GSS.
+
+# 1. Introduction 
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+With the continuous development of economy and society, more and more abundant material security has gradually focused the attention of the whole society on human's pursuit of spiritual needs, life quality and happiness. In today's people-centered society, which pays attention to human rights protection, the level of happiness is not only related to the healthy development of individual psychology and family life, but also affects the stability and harmony of the whole society. As an inevitable outcome of social and economic development, aging also urges the society to pay attention to and care for the special and growing group of "old people", so that they can share the fruits of rapid economic development. Therefore, the research on "happiness of the elderly" has attracted more and more attention from scholars all over the world.
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+At present, the research on "happiness" mainly focuses on economics, sociology and psychology, with a relatively complete research system and abundant research results. The following part introduces the research on the main factors affecting the happiness of the elderly. In terms of age, Chyi H and Mao S (2012) believe that the growth of age has a promoting effect on the happiness of the elderly. In terms of marriage, Marily (1985) pointed out in his study that marital status has a positive effect on the happiness of the elderly, but its promotion effect is weak, which may be related to the social environment and cultural traditions of the elderly. In terms of education level, Irena Grosfeld and Claudia Senik (2008) pointed out that the higher the level of education, the easier it is to obtain the factors to improve happiness. In addition, scholars have pointed out that the personality traits of the elderly (Ada Ferer-i-carbonell., John M. Gowdy, 2007) and political identity (JohnKnight. RamaniGunatilaka, 2010) also affect the happiness of the elderly to a certain extent.
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+M Jokela (2010) believes that after retirement, the loss of personal status and changes in social life make it difficult for the elderly to adapt, resulting in negative burnout emotions and reduced life satisfaction. PinquartM \& Schandlerl proposed as early as 2007 that people want to have the active choice and control over the retirement time, which will have an important impact on people's happiness to a certain extent. Barrett G \& Kecmanovic M (2013) both proposed that reemployment after retirement can help the elderly to ease the changes in life, social interaction and income brought by retirement, so as to improve their happiness. 
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+Through a comparative study on the elderly with disabilities and the able-bodied, Kudo etal. (2007) found that the life happiness of the able-bodied elderly was generally higher than that of the elderly with disabilities, and the happiness gradually decreased with the deepening of the degree of disability. Gray et al. (2008) pointed out that the elderly are eager to integrate into the society and to win the approval and affection of others. Chan and Lee (2006) found that the influence of social support and social participation on the happiness of the elderly exceeded income. Chyi and Mao (2012) found that the happiness of the elderly was significantly correlated with the level of economic income. Knesebecketal. (2003) believed that it was related to the psychological status of the elderly at a certain economic level. More importantly, Inglehart and Klingemann h (2000) found that after people reached a certain income level, the promotion effect of income increase on happiness gradually weakened. Knight et al. (2009) pointed out that relative income rather than absolute income influenced the happiness level of the elderly.
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+Attitudinal surveys are often scored using a Likert scale (Likert, 1932), which generates data in the form of ordinal, or ordered, responses. Probably the most common example is the extent of agreement with a view: strongly disagree, disagree.neither disagree nor agree, agree, and strongly agree. Such scales arise inevitably as a consequence of there being no natural unit of measurement for attitude. For various reasons, data on ordinal responses are awkward to handle statistically. Daykin A R(2002) expounds a statistical technique known as "ordered probit" which is suitable for the analysis of ordinal data. The central idea is that underlying the ordered response is a latent, continuously distributed random variable representing propensity to agree. The distributional parameters of this underlying latent variable are estimated using maximum likelihood, and these parameters have interpretations which are likely to be useful to the investigator.
+
+```{r,echo=FALSE , warning=FALSE, include=FALSE, paged.print=FALSE, r,echo=FALSE}
+library(tidyverse)
+library(psych)
+library(ggplot2)
+library(sweep)
+library(forecast)
+library(glmnet)
+```
+# 2. Data, variables and descriptive statistics
+## 2.1 Data description
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+These data are provided by Statistics Canada(GSS, https://sda-artsci-utoronto-ca.myaccess.library.utoronto.ca/sdaweb/html/gss.htm). The two primary objectives of the General Social Survey (GSS) are: to gather data on social trends in order to monitor changes in the living conditions and well being of Canadians over time; and to provide information on specific social policy issues of current or emerging interest. Starting with Cycle 16 (2002), this survey collects data on social support and aging. Cycle 16 collected data on care provided to seniors, care received by seniors, transitions to retirement, retirement experience, social contact, housing and transportation. In this survey, the target population is all persons aged 45 and over in private households in the ten provinces with regular telephone service. The sample was selected from people who responded to the Canadian Community Health Survey (CCHS), which collected data in 2001. Their are 24855 individiuals and 796 variables including sample weight, demographic variables, household size and composition, geographic identifiers and 11 sections.
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; The dependent variable of this paper is human happiness and we believe that happiness is measured by two variables, general life satisfaction and self-rated health status.
+By sorting out the literature, this paper will study the impact of demographic characteristics, retirement status, health, activity participation and economic income on the happiness of the elderly people.
+
+&nbsp;&nbsp;&nbsp;&nbsp; In order to study the influencing factors of happiness and their effects, 2 explanatory variables and 7 explanatory variables were set up in this paper through literature review and theoretical research. According to GSS, assign values to variables and make simple descriptive statistics. See Table 1 for the definition and description of each variable.
+
+
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("F:\\xianyu\\ps3")
+dt <- read.csv(file = 'main.csv')
+```
+
+The following shows some of the data transformated
+
+```{r,echo=FALSE}
+
+dt[dt$hs_q110 == 1, 'health'] <- "Excellent"
+dt[dt$hs_q110 ==2, 'health'] <- "Very good";
+dt[dt$hs_q110 ==3, 'health'] <- "Good";
+dt[dt$hs_q110 ==4, 'health'] <- "Fair";
+dt[dt$hs_q110 ==5, 'health'] <- "Poor";
+dt[dt$hs_q110 ==7, 'health'] <- "Not asked";
+dt[dt$hs_q110 ==8, 'health'] <- "Don't know";
+dt[dt$hs_q110 ==9, 'health'] <- "Not stated";
+
+dt[dt$hs_q120 == 1, 'satisfaction'] <- "Excellent"
+dt[dt$hs_q120 ==2, 'satisfaction'] <- "Very good";
+dt[dt$hs_q120 ==3, 'satisfaction'] <- "Good";
+dt[dt$hs_q120 ==4, 'satisfaction'] <- "Fair";
+dt[dt$hs_q120 ==5, 'satisfaction'] <- "Poor";
+dt[dt$hs_q120 ==7, 'satisfaction'] <- "Not asked";
+dt[dt$hs_q120 ==8, 'satisfaction'] <- "Don't know";
+dt[dt$hs_q120 ==9, 'satisfaction'] <- "Not stated";
+
+
+#age_2001_gr5
+
+
+dt[dt$age_2001_gr5 < 8,'age_group'] <- 'under 45'
+dt[dt$age_2001_gr5 ==8,'age_group'] <- '45-49'
+dt[dt$age_2001_gr5 ==9,'age_group'] <- '50-54'
+dt[dt$age_2001_gr5 ==10,'age_group'] <- '55-59'
+dt[dt$age_2001_gr5 ==11,'age_group'] <- '60-64'
+dt[dt$age_2001_gr5 ==12,'age_group'] <- '65-69'
+dt[dt$age_2001_gr5 ==13,'age_group'] <- '70-74'
+dt[dt$age_2001_gr5 ==14,'age_group'] <- '75-79'
+dt[dt$age_2001_gr5 ==15,'age_group'] <- 'over 79'
+
+
+#Sex of respondent
+# sex
+
+# Marital status of the respondent
+# marstat_h
+
+# During the past month, did you often, sometimes or 
+#rarely or never ... exercise or participate in sports, such as golf, swimming or curling?
+dt[dt$act_q420 ==1,'exercise'] <- 'Often'
+dt[dt$act_q420 ==2,'exercise'] <- 'Sometimes'
+dt[dt$act_q420 ==3,'exercise'] <- 'Rarely or never'
+dt[dt$act_q420 ==7,'exercise'] <- 'Not asked'
+dt[dt$act_q420 ==9,'exercise'] <- 'Not stated'
+
+
+
+# hui_pad1	
+# Pain and discomfort trouble
+dt[dt$hui_pad1	 ==1,'Pain'] <- 'No pain or discomfort'
+dt[dt$hui_pad1	 ==2,'Pain'] <- 'Mild / moderate / severe pain; does not prevent activity'
+dt[dt$hui_pad1	 ==3,'Pain'] <- 'prevents a few activities'
+dt[dt$hui_pad1	 ==4,'Pain'] <- 'prevents some activities'
+dt[dt$hui_pad1	 ==5,'Pain'] <- 'prevents most activities'
+dt[dt$hui_pad1	 ==9,'Pain'] <- 'Not stated'
+
+
+# hui_emo1	
+# Emotional trouble
+dt[dt$hui_emo1	 ==1,'Emotion'] <- 'Happy & interested in life'
+dt[dt$hui_emo1	 ==2,'Emotion'] <- 'Somewhat happy'
+dt[dt$hui_emo1	 ==3,'Emotion'] <- 'Somewhat unhappy'
+dt[dt$hui_emo1	 ==4,'Emotion'] <- 'Unhappy with little interest in life'
+dt[dt$hui_emo1	 ==5,'Emotion'] <- 'So unhappy that life is not worthwile'
+dt[dt$hui_emo1	 ==9,'Emotion'] <- 'Not stated'
+
+
+# hui_cog1	
+# Memory and thinking trouble
+dt[dt$hui_cog1	 ==1,'Memory'] <- 'No pain or discomfort'
+dt[dt$hui_cog1	 ==2,'Memory'] <- 'Mild / moderate / severe pain; does not prevent activity'
+dt[dt$hui_cog1	 ==3,'Memory'] <- 'prevents a few activities'
+dt[dt$hui_cog1	 ==4,'Memory'] <- 'prevents some activities'
+dt[dt$hui_cog1	 ==5,'Memory'] <- 'prevents most activities'
+dt[dt$hui_cog1	 ==9,'Memory'] <- 'Not stated'
+
+
+
+# everretired	
+# Respondent ever retired?
+  
+dt[dt$everretired	 ==1,'Everretired'] <- 'Yes'
+dt[dt$everretired	 ==2,'Everretired'] <- "No"
+dt[dt$everretired	 ==3,'Everretired'] <- 'Never retired or retired before 30 years of age'
+dt[dt$everretired	 ==4,'Everretired'] <- 'Yes & RE module not asked'
+dt[dt$everretired	 ==5,'Everretired'] <- 'No & RP module not asked'
+dt[dt$everretired	 ==7,'Everretired'] <- 'Not asked (proxy interview)'
+dt[dt$everretired	 ==8,'Everretired'] <- 'Dont know'
+dt[dt$everretired	 ==9,'Everretired'] <- 'Not stated'
+
+# incm_h	
+# Annual personal income of the respondent
+dt[dt$incm_h	 ==1,'income'] <- "No income"
+dt[dt$incm_h	 ==2,'income'] <- "Less than $15,000"
+dt[dt$incm_h	 ==3,'income'] <- "$15,000 to $29,999"
+dt[dt$incm_h	 ==4,'income'] <- "$30,000 to $49,999"
+dt[dt$incm_h	 ==5,'income'] <- "$50,000 to $79,999"
+dt[dt$incm_h	 ==7,'income'] <- "$80,000 or more"
+dt[dt$incm_h	 ==8,'income'] <- "Dont know"
+dt[dt$incm_h	 ==9,'income'] <- "Not stated"
+
+# hs_q110,hs_q120,age_2001_gr5,sex,marstat_h,hui_pad1,hui_emo1,hui_cog1,hui_cog1,incm_h
+# health,satisfaction,age_group,exercise,Pain,Emotion,Memory,Everretired,income
+# head(dt[c("hs_q110","hs_q120","age_2001_gr5","age_group","sex","marstat_h","hui_pad1","hui_emo1","hui_cog1","hui_cog1","incm_h")])
+head(dt[c( "health","satisfaction","age_group","exercise","Pain","Emotion","Memory","Everretired","income")],2)
+```
+
+\begin{center}
+ Table 1: The definition and description of each variable.
+\end{center}
+| Variable | Meaning | Definitions |
+| :--| --- | :------ |
+| hs_q110 |Usual state of health | Measured in scale 1=Excellent, 2	=Very good,3=Good,4=Fair,5=Poor, 7= Not asked,8=Dont know,9=Not stated.|
+| hs_q120 | Satisfaction with life at present | Measured in scale 1=Excellent, 2	=Very good,3=Good,4=Fair,5=Poor, 7= Not asked,8=Dont know,9=Not stated. |
+| age_2001_gr5| Age group (5-year)  | Measured in scale 1 to 15.|
+|sex |Male or Female| Measured in scale 1=Male, 2=Female.|
+|marstat_h | Marital status | Measured in scale 1=Living common-law, 2= Married, 3 = Widowed/Divorced/Separated, 4 = Single (Never married), 5 = Dont know.|
+|hui_pad1 | Pain and discomfort trouble |Measured in scale 1=No pain or discomfort, 2=Mild / moderate / severe pain; does not prevent activity,3 =prevents a few activities,4=prevents some activities,5=prevents most activities,9 = Not stated.|
+|hui_emo1 | Emotional trouble | Measured in scale 1=Happy & interested in life, 2=Somewhat happy,3=Somewhat unhappy, 4=Unhappy with little interest in life, 5=So unhappy that life is not worthwile, 9 = Not stated.|
+|hui_cog1 | Memory and thinking trouble | Measured in scale 1=No pain or discomfort, 2=Mild / moderate / severe pain; does not prevent activity,3 =prevents a few activities,4=prevents some activities,5=prevents most activities,9 = Not stated.|
+|incm_h   | Annual personal income | Measured in scale 1=No income, 2	= Less than \$15,000,3	 =\$15,000 to \$29,999,4	=\$30,000 to \$49,999, 5=\$50,000 to \$79,999, 6	=\$80,000 or more, 8=Dont know, 9=Not stated.|
+
+## 2.2 Distribution analysis
+
+
+```{r fig.height=4, fig.width=8, include=FALSE}
+sex_health <- xtabs(~sex+factor(health),data=dt)
+round(prop.table(sex_health)*100,2)
+```
+
+\begin{center}
+ Table 2: The description of self-reported health.
+\end{center}
+|  Health report|   1 |  2  | 3 | 4| 5| 7| 8| 9|
+| :--|---|---|---|---| ---|---|---|--- |
+|Count|5986| 8586| 5892| 2260|  596| 1288|  138|  109| 
+|Frequency|24.08| 34.54| 23.71|  9.09 | 2.40 |5.18 |0.56 |0.44| 
+
+\begin{center}
+ Table 3: The description of self-reported satisfaction.
+\end{center}
+|  Life satisfaction report|   1 |  2  | 3 | 4| 5| 7| 8| 9|
+| :--|---|---|---|---| ---|---|---|---|
+|Count|5893| 8987| 6243| 1671|  401| 1288|  215|  157| 
+|Frequency|23.71| 36.16| 25.12|  6.72 | 1.61 |5.18 |0.87 |0.63| 
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+The results are as follows: Table 2 and table 3 are the descriptive statistics of overall happiness, and the descriptive statistics of self_report health. Compared with the two variables, the situation of happiness evaluation index is slightly better. 23.71\% respondents describe their satisfaction with life in general at present excellent and  36.16\% respondents' overall satisfaction with their current life is good. Compared to other people your age, 24.08\% respondents describe your usual state of health excellent and  36.16\% respondents said it's good. 
+
+
+```{r fig.height=4, fig.width=8, include=FALSE}
+sex_health <- xtabs(~sex+factor(satisfaction),data=dt)
+round(prop.table(sex_health)*100,2)
+```
+
+
+```{r fig.width=6,fig.height=3,echo=FALSE}
+library(ggplot2)
+ggplot(data = dt,aes(x = sex , y = ..count.., fill=factor(hs_q110))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('gender') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+\begin{center}
+Figure1: Gender and health distribution
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp; 
+Figure1 gives the joint distribution of gender and age distribution in our data. The age struture for both gender is similar where 1 means male and 2 means female and there are more women  surveyed than men. As can be seen from the figure, a large proportion of respondents considered themselves to be very healthy and relatively healthy regardless of their gender. Men, on the other hand, rated their own health slightly higher than women.
+
+
+```{r fig.width=6,fig.height=3,echo=FALSE}
+ggplot(data = dt,aes(x = sex , y = ..count.., fill=factor(hs_q120))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('gender') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+\begin{center}
+Figure 2: Gender and satisfaction distribution
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Figure 2 shows the joint distribution of gender and satisfaction, The left half represents the frequency distribution of men's satisfaction index, and the right side represents the frequency distribution of women. Same to what we might think, the percentage of men who think they are easily disappointed is actually much lower than women. 
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = age_group , y = ..count.., fill=factor(hs_q110))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('age') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+\begin{center}
+Figure 3: Age and health distribution.
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Figure 3 compares the views of people of different ages group on the issue of health. As can be seen from the figure, regardless of age, the proportion of those with positive attitude is the highest. As the respondents grew older, their health deteriorated and so did their satisfaction, which is shown in figure 4.
+
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = age_group , y = ..count.., fill=as.factor(hs_q120))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('age') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+\begin{center}
+Figure 4: Age and satisfaction distribution.
+\end{center}
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = exercise , y = ..count.., fill=as.factor(hs_q110))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('exercise') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+\begin{center}
+Figure 5: Exercise and health distribution
+\end{center}
+
+
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = exercise , y = ..count.., fill=as.factor(hs_q120))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('exercise') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+\begin{center}
+Figure 6: Exercise and satisfaction distribution
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Similarly, Figure 5 and Figure 6 show the joint distribution of exercise and well-being. The happiness and health of the regular exercisers was significantly higher than that of the inactive.Taking part in sports not only strengthens the body, but also makes people feel happy on a certain level.
+
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = marstat_h , y = ..count.., fill=as.factor(hs_q110))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('marstat_h') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+\begin{center}
+Figure 7: marstat\_h and hs\_q120 Distribution
+\end{center}
+
+
+
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = marstat_h , y = ..count.., fill=as.factor(hs_q120))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('marstat_h') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+\begin{center}
+Figure 8: marstat\_h and hs\_q120 Distribution
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+As you can see from Figure 7 and Figure 8, people with partners are generally better off than those who live alone.
+
+
+```{r fig.width=8,fig.height=4,echo=FALSE}
+ggplot(data = dt,aes(x = incm_h , y = ..count.., fill=as.factor(hs_q120))) + 
+    geom_bar(stat = "count", position='dodge') + 
+    xlab('incm_h') + 
+    ylab('Count') + 
+    theme_bw()+
+    geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+    theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+\begin{center}
+Figure 9: incm_h and hs\_q120 Distribution
+\end{center}
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+The income level is significantly correlated with the living standard evaluation of the elderly.Among the elderly with a total annual income of over 80,000 yuan,78.82% are satisfied with their life, 39.66% of them are very satisfied with their life.As incomes fall, the proportion of people who think their living standards are poor rises.When the income is less than 15,000 yuan, only 49.71 percent of people have high life satisfaction.
+
+# 3. Model
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Since the explained variables in this paper are not only discrete but also orderly, it is necessary to carry out regression for the score probability of the explained variables. Therefore, the Ordered Probit regression model is selected to verify whether various influencing factors have significant influence on the two dimensions of overall happiness and emotional well-being of the elderly, namely:
+
+$P\left(y_{k}=j / x\right)=\beta_{k 0}+\sum_{i=1}^{14} \beta_{k i} x_{1 i}+\sum_{i=1}^{2} \beta_{k, i+14} x_{2 i}+\sum_{i=1}^{5} \beta_{k, i+16} x_{3 i}+\sum_{i=1}^{4} \beta_{k, i+21}x_{4 i}+\sum_{i=1}^{8} \beta_{k, i+25}x_{5 i}+\sum_{i=1}^{4} \beta_{k, i+33}x_{6 i}+\sum_{i=1}^{8} \beta_{k, i+37}x_{7 i}+\varepsilon_{k}$.
+
+where $y_1$ denotes  hs_q110 and $y_2$ denotes hs_q120. $x_{1}$ to $x_{7}$ denotes variables in table 1 from age_2001_gr5 to incm_h.
+
+\begin{center}
+ Table 4: Ordered Probit full sample regression results of hs\_q110.
+\end{center}
+```{r echo=FALSE}
+library(MASS)
+fq110 <- polr(as.factor(hs_q110) ~ age_2001_gr5 + sex + marstat_h+hui_pad1+hui_emo1+hui_cog1+incm_h,method="probit",Hess=T, data=dt) 
+summary(fq110)
+```
+
+\begin{center}
+ Table 5: Ordered Probit full sample regression results of hs\_q120.
+\end{center}
+```{r echo=FALSE}
+fq120 <- polr(as.factor(hs_q120) ~ age_2001_gr5 + sex + marstat_h+hui_pad1+hui_emo1+hui_cog1+incm_h,method="probit",Hess=T, data=dt) 
+summary(fq120)
+```
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Table 4 and Table 5 shows the parameter estimates and their corresponding analysis follows.
+Compared with men, women have higher life standard evaluation and overall life satisfaction, but relatively more negative emotions. The reasons are as follows: first, women retire earlier than men and have a longer life expectancy than men, so they have a longer time to adapt to the life after retirement and adjust their body and mind. Second, the housework undertaken by women to some extent effectively alleviates the changes in the pace of life after retirement. But the female nature in the emotion is more sensitive than the male, prone to emotional fluctuations, so the negative emotion is relatively more. Older people's overall life satisfaction increases with age, suggesting that older people are maturing in mentality and becoming more contented and grateful towards the end of their lives, but their physical fitness declines with age.
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+According to the retirement variable, people's happiness is higher than that before retirement. The possible reason is that after retirement, people can release themselves from the heavy work pressure and make reasonable arrangements for the pace of life according to their interests and preferences. Secondly, the reduction of daily social expenditure after retirement and the abundant pension savings before retirement can satisfy the elderly to enjoy their old age.
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+In the healthy state, with the increase of the number of chronic diseases, people's self-evaluation of health status becomes negative. It can be seen that chronic diseases seriously affect people's later life, which not only has a negative impact on their life quality, but also greatly affects people's happiness caused by physical discomfort and life inconvenience brought by chronic diseases. Therefore, as the number of chronic diseases increases, the happiness of the elderly decreases.Not only did older adults who suffered from physical pain self-report poorer health, but pain had a significant negative impact on overall life satisfaction.
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+In terms of exercise frequency, increasing exercise frequency will have a positive and significant impact on people's happiness. These positive effects are reflected in both overall life satisfaction and overall happiness of self-rated health. Through the participation of social activities, on the one hand, it can effectively alleviate the emptiness of retirement life, through participating in some meaningful social activities to achieve their own value;On the other hand, by expanding your social circle and sharing your joys and sorrows with your peers, you can relieve loneliness and also make yourself happy.
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+In terms of economic income, as shown in the table, with the increase of income, the elderly's evaluation of living standard and overall life satisfaction are improved, which leads to the increase of happiness. Therefore, to a certain extent, economic income promotes the happiness of the elderly, which is true.
+
+
+
+# Discussion
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+This paper measures the happiness of the elderly from the two dimensions of overall well-being and emotional well-being, and based on GSS, comprehensively and systematically explores the influencing factors of the happiness of the elderly from the five aspects of basic demographic characteristics, retirement status, health status, activity participation and economic income level. This paper firstly studies the general status of happiness of the elderly and the differences of happiness of different groups of the elderly through descriptive statistics. Then, Ordered Probit regression model was used to verify whether various factors had significant effects on the happiness of the elderly. Through systematic and comprehensive factor analysis, we hope to provide theoretical support and practical guidance for the formulation and implementation of relevant policies.
+
+# References
+
+[1] Chyi, Hau, and Shangyi Mao. "The determinants of happiness of China’s elderly population." Journal of Happiness Studies 13.1 (2012): 167-185.
+
+[2] Grosfeld I, Senik C. The Emerging Aversion to Inequality-Evidence from Poland, 1992-2005[J]. 2008.
+
+[3] Ferrer-i-Carbonell A, Gowdy J M. Environmental degradation and happiness[J]. Ecological economics, 2007, 60(3): 509-516.
+
+[4] Knight J, Gunatilaka R. Great expectations? The subjective well-being of rural–urban migrants in China[J]. World development, 2010, 38(1): 113-124.
+
+[5] Jokela M, Ferrie J E, Gimeno D, et al. From midlife to early old age: health trajectories associated with retirement[J]. Epidemiology (Cambridge, Mass.), 2010, 21(3): 284.
+
+[6] Pinquart M, Schindler I. Changes of life satisfaction in the transition to retirement: a latent-class approach[J]. Psychology and aging, 2007, 22(3): 442.
+
+[7] Barrett G F, Kecmanovic M. Changes in subjective well-being with retirement: assessing savings adequacy[J]. Applied Economics, 2013, 45(35): 4883-4893.
+
+[8] Inglehart R, Klingemann H D. Genes, culture, democracy, and happiness[J]. Culture and subjective well-being, 2000: 165-183.
+
+[9] Knight S, Herzog H. All creatures great and small: New perspectives on psychology and human–animal interactions[J]. Journal of Social Issues, 2009, 65(3): 451-461.
+
+[10] Panchenko D. (2016).443 Statistics for Applications, Section 14, Simple Linear Regression. Massachusetts Institute of Technology: MIT OpenCourseWare.
+
+[11] Hausman J A, Lo A W, MacKinlay A C. An ordered probit analysis of transaction stock prices[J]. Journal of financial economics, 1992, 31(3): 319-379.
+
+[12] Daykin A R, Moffatt P G. Analyzing ordered responses: A review of the ordered probit model[J]. Understanding Statistics: Statistical Issues in Psychology, Education, and the Social Sciences, 2002, 1(3): 157-166.
+
+[13] Likert R. A technique for the measurement of attitudes[J]. Archives of psychology, 1932.
